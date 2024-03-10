@@ -1,27 +1,27 @@
 const mongoose = require("mongoose");
-const { ProductModel } = require("../models");
+const ProductModel = require("../models/product");
 
 //Dealing with data base operations
 class ProductRepository {
   async CreateProduct({
     name,
-    desc,
-    type,
-    unit,
+    description,
+    category,
+    foodType,
+    readyTime,
     price,
-    available,
-    suplier,
-    banner,
+    rating,
+    images,
   }) {
     const product = new ProductModel({
       name,
-      desc,
-      type,
-      unit,
+      description,
+      category,
+      foodType,
+      readyTime,
       price,
-      available,
-      suplier,
-      banner,
+      rating,
+      images,
     });
 
     const productResult = await product.save();
@@ -37,7 +37,7 @@ class ProductRepository {
   }
 
   async FindByCategory(category) {
-    const products = await ProductModel.find({ type: category });
+    const products = await ProductModel.find({ category: category });
 
     return products;
   }

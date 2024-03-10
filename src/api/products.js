@@ -1,33 +1,51 @@
 const ProductService = require("../services/product-service");
 const { RPCObserver } = require("../utils");
+const multer = require('multer');
 
 module.exports = (app, channel) => {
+
   const service = new ProductService();
 
   RPCObserver("PRODUCT_RPC", service);
 
-  app.post("/product/create", async (req, res, next) => {
-    const { name, desc, type, unit, price, available, suplier, banner } =
+  const imageStorage = multer.diskStorage({
+    destination: function(req, file, cb){
+        console.log('Destination function called with file:', file); // NEW
+        cb(null, 'images')
+    },
+    filename: function(req, file, cb){
+        console.log('Filename function called with file:', file); // NEW
+        const date = new Date().toISOString().replace(/:/g, '-');
+        cb(null, date + '_' + file.originalname);
+    }
+    
+})
+
+const images = multer({ storage: imageStorage }).array('images', 10);
+
+  app.post("/product/create", images, async (req, res, next) => {
+    const { name, description, category, foodType, readyTime, price, rating } =
       req.body;
+    const images = req.files.map(file => file.path);
     // validation
     const { data } = await service.CreateProduct({
       name,
-      desc,
-      type,
-      unit,
+      description,
+      category,
+      foodType,
+      readyTime,
       price,
-      available,
-      suplier,
-      banner,
+      rating,
+      images,
     });
     return res.json(data);
   });
 
-  app.get("/category/:type", async (req, res, next) => {
-    const type = req.params.type;
+  app.get("/category/:category", async (req, res, next) => {
+    const category = req.params.category;
 
     try {
-      const { data } = await service.GetProductsByCategory(type);
+      const { data } = await service.GetProductsByCategory(category);
       return res.status(200).json(data);
     } catch (error) {
       return res.status(404).json({ error });

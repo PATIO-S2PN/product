@@ -17,8 +17,8 @@ class ProductService {
 
     let categories = {};
 
-    products.map(({ type }) => {
-      categories[type] = type;
+    products.map(({ category }) => {
+      categories[category] = category;
     });
 
     return FormateData({
