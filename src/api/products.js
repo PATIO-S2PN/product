@@ -1,6 +1,7 @@
 const ProductService = require("../services/product-service");
 const { RPCObserver } = require("../utils");
 const multer = require('multer');
+const UserAuth = require("./middlewares/auth");
 
 module.exports = (app, channel) => {
 
@@ -23,7 +24,7 @@ module.exports = (app, channel) => {
 
 const images = multer({ storage: imageStorage }).array('images', 10);
 
-  app.post("/product/create", images, async (req, res, next) => {
+  app.post("/product/create",UserAuth, images, async (req, res, next) => {
     const { name, description, category, foodType, readyTime, price, rating } =
       req.body;
     const images = req.files.map(file => file.path);
@@ -74,7 +75,6 @@ const images = multer({ storage: imageStorage }).array('images', 10);
       .json({ msg: "/ or /products : I am products Service" });
   });
 
-  //get Top products and category
   app.get("/", async (req, res, next) => {
     //check validation
     try {
