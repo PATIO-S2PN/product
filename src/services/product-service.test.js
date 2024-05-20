@@ -56,6 +56,20 @@ describe('ProductService', () => {
       await expect(service.CreateProduct(mockProduct))
         .rejects.toThrow('Failed to create product');
     });
+
+    it('should return formatted error if product data is invalid', async () => {
+      const invalidProduct = { name: '', category: 'Category1', price: 100 }; // Missing required fields
+      const errorResponse = { error: 'Invalid product data' };
+
+      service.repository.CreateProduct.mockResolvedValue(null);
+      FormateData.mockReturnValue(errorResponse);
+
+      const result = await service.CreateProduct(invalidProduct);
+
+      expect(service.repository.CreateProduct).toHaveBeenCalledWith(invalidProduct);
+      expect(FormateData).toHaveBeenCalledWith(null); // Ensure FormateData is called with null
+      expect(result).toEqual(errorResponse);
+    });
   });
 
   ////////////////////////// Get Products //////////////////////////////
@@ -77,7 +91,10 @@ describe('ProductService', () => {
       const result = await service.GetProducts();
 
       expect(service.repository.Products).toHaveBeenCalled();
-      expect(FormateData).toHaveBeenCalledWith(formattedData);
+      expect(FormateData).toHaveBeenCalledWith({
+        products: mockProducts,
+        categories: ['Category1', 'Category2']
+      });
       expect(result).toEqual(formattedData);
     });
 
@@ -86,6 +103,23 @@ describe('ProductService', () => {
 
       await expect(service.GetProducts())
         .rejects.toThrow('Failed to get products');
+    });
+
+    it('should return an empty array if no products are found', async () => {
+      const emptyProducts = [];
+      const formattedData = {
+        products: emptyProducts,
+        categories: []
+      };
+
+      service.repository.Products.mockResolvedValue(emptyProducts);
+      FormateData.mockReturnValue(formattedData);
+
+      const result = await service.GetProducts();
+
+      expect(service.repository.Products).toHaveBeenCalled();
+      expect(FormateData).toHaveBeenCalledWith(formattedData);
+      expect(result).toEqual(formattedData);
     });
   });
 
@@ -108,6 +142,18 @@ describe('ProductService', () => {
 
       await expect(service.GetProductDescription('1'))
         .rejects.toThrow('Failed to get product description');
+    });
+
+    it('should return an error if product is not found', async () => {
+      const errorResponse = { error: 'Product not found' };
+      service.repository.FindById.mockResolvedValue(null);
+      FormateData.mockReturnValue(errorResponse);
+
+      const result = await service.GetProductDescription('1');
+
+      expect(service.repository.FindById).toHaveBeenCalledWith('1');
+      expect(FormateData).toHaveBeenCalledWith(null); // Ensure FormateData is called with null
+      expect(result).toEqual(errorResponse);
     });
   });
 
@@ -134,6 +180,18 @@ describe('ProductService', () => {
 
       await expect(service.GetProductsByCategory('Category1'))
         .rejects.toThrow('Failed to get products by category');
+    });
+
+    it('should return an empty array if no products are found for the category', async () => {
+      const emptyProducts = [];
+      service.repository.FindByCategory.mockResolvedValue(emptyProducts);
+      FormateData.mockReturnValue(emptyProducts);
+
+      const result = await service.GetProductsByCategory('Category1');
+
+      expect(service.repository.FindByCategory).toHaveBeenCalledWith('Category1');
+      expect(FormateData).toHaveBeenCalledWith(emptyProducts);
+      expect(result).toEqual(emptyProducts);
     });
   });
 
@@ -236,4 +294,3 @@ describe('ProductService', () => {
     });
   });
 });
-
