@@ -25,7 +25,7 @@ module.exports = (app, channel) => {
 const images = multer({ storage: imageStorage }).array('images', 10);
 
   app.post("/product/create",UserAuth, images, async (req, res, next) => {
-    const { name, description, category, foodType, readyTime, price, rating } =
+    const { name, description, category, foodType, readyTime, price, rating, isSpecial } =
       req.body;
     const images = req.files.map(file => file.path);
     // validation
