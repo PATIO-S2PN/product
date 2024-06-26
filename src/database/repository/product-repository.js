@@ -12,6 +12,7 @@ class ProductRepository {
     price,
     rating,
     images,
+    isSpecial,
   }) {
     const product = new ProductModel({
       name,
@@ -22,6 +23,7 @@ class ProductRepository {
       price,
       rating,
       images,
+      isSpecial,
     });
 
     const productResult = await product.save();
