@@ -38,6 +38,7 @@ const images = multer({ storage: imageStorage }).array('images', 10);
       price,
       rating,
       images,
+      isSpecial,
     });
     return res.json(data);
   });
