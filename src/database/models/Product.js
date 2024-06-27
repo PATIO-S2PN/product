@@ -11,6 +11,7 @@ const ProductSchema = new Schema({
     price: {type: Number},
     rating: {type: Number},
     images: {type: [String]},
+    isSpecial: { type: Boolean, default: false }
 },{
     toJSON: {
         transform(doc, ret){

@@ -25,7 +25,7 @@ module.exports = (app, channel) => {
 const images = multer({ storage: imageStorage }).array('images', 10);
 
   app.post("/product/create",UserAuth, images, async (req, res, next) => {
-    const { name, description, category, foodType, readyTime, price, rating } =
+    const { name, description, category, foodType, readyTime, price, rating, isSpecial } =
       req.body;
     const images = req.files.map(file => file.path);
     // validation
@@ -38,6 +38,7 @@ const images = multer({ storage: imageStorage }).array('images', 10);
       price,
       rating,
       images,
+      isSpecial,
     });
     return res.json(data);
   });
@@ -84,4 +85,9 @@ const images = multer({ storage: imageStorage }).array('images', 10);
       return res.status(404).json({ error });
     }
   });
+
+  app.use((req, res, next) => {
+    res.status(404).json({ error: 'Route not found' });
+  });
+  
 };
